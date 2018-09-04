@@ -6,7 +6,7 @@ with io.open('README', 'rt', encoding='utf8') as f:
 
 setup(
     name='plug-platter',
-    version='1.1.0',
+    version='1.1.1',
     url='https://github.com/qadre/platter/',
     license='BSD',
     description='A deployment helper for Python.',
