@@ -112,7 +112,7 @@ echo 'Done.'
 
 
 def clean_line(data):
-    return str(data).decode('utf-8')
+    return str(data.decode('utf-8'))
 
 
 class Log(object):
