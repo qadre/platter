@@ -111,6 +111,10 @@ echo 'Done.'
 '''
 
 
+def clean_line(data):
+    return str(data).decode('utf-8')
+
+
 class Log(object):
 
     def __init__(self):
@@ -147,7 +151,7 @@ class Log(object):
                         raise
                 else:
                     color = f == process.stdout and 'cyan' or 'yellow'
-                    self.echo(click.style(line.rstrip(), fg=color))
+                    self.echo(click.style(clean_line(line.rstrip()), fg=color))
 
     @contextmanager
     def indented(self):
@@ -296,10 +300,10 @@ class Builder(object):
             capture=True).strip().splitlines()
         platform = sysconfig.get_platform()
         return {
-            'name': rv[0],
-            'version': rv[1],
+            'name': clean_line(rv[0]),
+            'version': clean_line(rv[1]),
             'platform': platform,
-            'ident': rv[2],
+            'ident': clean_line(rv[2]),
         }
 
     def copy_file(self, filename, target):
@@ -355,16 +359,15 @@ class Builder(object):
         fn = os.path.join(scratchpad, 'install.sh')
 
         with open(install_script_path) as f:
-            postinstall = f.read().rstrip().decode('utf-8')
+            postinstall = f.read().rstrip()
 
         with open(fn, 'w') as f:
             f.write((INSTALLER % dict(
                 name=pkginfo['ident'],
                 pkg=pkginfo['name'],
                 python=os.path.basename(self.python),
-                postinstall=postinstall,
-            )).encode('utf-8'))
-        os.chmod(fn, 0100755)
+                postinstall=postinstall)))
+        os.chmod(fn, int("0100755", 8))
 
     def put_meta_info(self, scratchpad, pkginfo):
         self.log.info('Placing meta information')
@@ -372,11 +375,11 @@ class Builder(object):
             json.dump(pkginfo, f, indent=2)
             f.write('\n')
         with open(os.path.join(scratchpad, 'VERSION'), 'w') as f:
-            f.write(pkginfo['version'].encode('utf-8') + '\n')
+            f.write(pkginfo['version'] + '\n')
         with open(os.path.join(scratchpad, 'PLATFORM'), 'w') as f:
-            f.write(pkginfo['platform'].encode('utf-8') + '\n')
+            f.write(pkginfo['platform'] + '\n')
         with open(os.path.join(scratchpad, 'PACKAGE'), 'w') as f:
-            f.write(pkginfo['name'].encode('utf-8') + '\n')
+            f.write(pkginfo['name'] + '\n')
 
     def create_archive(self, scratchpad, pkginfo, format):
         base = pkginfo['ident'] + '-' + pkginfo['platform']
